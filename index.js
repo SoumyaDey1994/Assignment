@@ -5,7 +5,6 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const mongoose = require('mongoose');
 /**
  * Import the routes
  */
@@ -20,8 +19,11 @@ const app = express();
  * Registering middlewares
  */
 app.use(bodyParser.json());
-app.use(morgan());
-
+app.use(morgan('combined'));
+/**
+ * Connect to DB
+ */
+require('./startup/db')();
 /**
  * Initialize the Routes
  */
@@ -32,10 +34,6 @@ app.use('/', homeRoute);
  * Fetch port from environmental variable
  */
 const port = process.env.PORT;
-const dbConnectionString = process.env.DB_CONNECTION_STRING;
-mongoose.connect(dbConnectionString, {useNewUrlParser: true})
-        .then(()=>console.log(`Connected to MongoDb Successfully`))
-        .catch((error)=>console.log(`Error in connecting to mongoDB`));
 /**
  * Start Express app
  */
