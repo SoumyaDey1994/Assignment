@@ -1,3 +1,4 @@
+const xlsx = require('json2xls');
 const express = require('express');
 const route = express.Router();
 const validate = require('../validation/user');
@@ -6,8 +7,31 @@ const user = require('../service/user');
 const userController = require('../controllers/user');
 
 
-route.get('/', (req, res)=>{
-    res.status(200).json({"message": "I am in Data Route"});
+route.get('/', async (req, res)=>{
+    const response = await user.export();
+    if(response.success){
+        return res.status(200).json({'data': response.result});
+    }else{
+        return res.status(500).json({"error": error});
+    }
+})
+
+route.get('/export', xlsx.middleware, async (req, res)=>{
+    const response = await user.export();
+    if(response.success){
+        return res.status(200).xls('user.xlsx', response.result);
+    }else{
+        return res.status(500).json({"error": error});
+    }
+})
+
+route.get('/:userId', async (req, res)=>{
+    const response = await user.fetchUser(req.params.userId);
+    if(response.success){
+        return res.status(200).json({"data": response.result});
+    }else{
+        return res.status(500).json({"error": error});
+    }
 })
 
 route.post('/', async (req, res)=>{
@@ -46,5 +70,35 @@ route.post('/bulk', (req, res)=>{
    })
 })
 
+route.put('/:userId', async (req, res)=>{
+    const userId = req.params.userId || null;
+    const updatedInfo = req.body.data || null;
+    if(!userId){
+        return res.status(400).json({"error": "Please provide a user Id to update details"});
+    }
+    if(!updatedInfo || Object.keys(updatedInfo).length === 0){
+        return res.status(400).json({"error": "No Details to update"});
+    }else{
+        const response = await user.updateUser(userId, updatedInfo);
+        if(response.success){
+            return res.status(200).json({"data": response.result});
+        }else{
+            return res.status(500).json({"error": response.error});
+        }
+    }
+})
 
+route.delete('/:userId', async (req, res)=>{
+    const userId = req.params.userId || null;
+    if(!userId){
+        return res.status(400).json({"error": "Please provide a user Id to update details"});
+    }else{
+        const response = await user.deleteUser(userId);
+        if(response.success){
+            return res.status(200).json({"data": response.result});
+        }else{
+            return res.status(500).json({"error": response.error});
+        }
+    }
+})
 module.exports = route;
