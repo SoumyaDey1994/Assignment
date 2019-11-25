@@ -3,17 +3,18 @@ const express = require('express');
 const route = express.Router();
 const validate = require('../validation/user');
 
-const user = require('../service/user');
+const user = require('../services/user');
 const userController = require('../controllers/user');
 
 
-route.get('/', async (req, res)=>{
-    const response = await user.export();
-    if(response.success){
-        return res.status(200).json({'data': response.result});
-    }else{
-        return res.status(500).json({"error": error});
-    }
+route.get('/', (req, res)=>{
+    userController.fetchAllRecords((error, data)=>{
+        if(error){
+            return res.status(error.status).json({"error": error.errorMsg});
+        }else{
+            return res.status(data.status).json({"data": data.result});
+        }
+    })
 })
 
 route.get('/export', xlsx.middleware, async (req, res)=>{
@@ -25,37 +26,25 @@ route.get('/export', xlsx.middleware, async (req, res)=>{
     }
 })
 
-route.get('/:userId', async (req, res)=>{
-    const response = await user.fetchUser(req.params.userId);
-    if(response.success){
-        return res.status(200).json({"data": response.result});
-    }else{
-        return res.status(500).json({"error": error});
-    }
+route.get('/:userId', (req, res)=>{
+    userController.fetchUser(req.params.userId, (error, data)=>{
+        if(error){
+            return res.status(error.status).json({"error": error.errorMsg});
+        }else{
+            return res.status(data.status).json({"data": data.result});
+        }
+    })
 })
 
-route.post('/', async (req, res)=>{
+route.post('/', (req, res)=>{
 
-    if(!req.body || !req.body.data){
-        // Handle Validation Error
-        res.status(400).json({"error": "Please Provide a valid Request Body having data object"});
-    }else{
-        const error = validate(req.body.data);
+    userController.createUser(req.body, (error, data)=>{
         if(error){
-            // Handle Validation Error
-            res.status(400).json({"code": error.name, "message":  error.details});
+            return res.status(error.status).json({"error": error.errorMsg});
         }else{
-            /**Request Successfully validated
-            * Inser to mongodb
-            */
-            const response = await user.insert(req.body.data);
-            if(response.success){
-                res.status(200).json({"message": "Records Inserted Successfully", "data": response.result});
-            }else{
-                res.status(500).json({"message": "Error occured while saving data"});
-            }
+            return res.status(data.status).json({"data": data.result});
         }
-    }
+    })
 })
 
 route.post('/bulk', (req, res)=>{
@@ -88,17 +77,14 @@ route.put('/:userId', async (req, res)=>{
     }
 })
 
-route.delete('/:userId', async (req, res)=>{
+route.delete('/:userId', (req, res)=>{
     const userId = req.params.userId || null;
-    if(!userId){
-        return res.status(400).json({"error": "Please provide a user Id to update details"});
-    }else{
-        const response = await user.deleteUser(userId);
-        if(response.success){
-            return res.status(200).json({"data": response.result});
+    userController.removeUser(userId, (error, data)=>{
+        if(error){
+            return res.status(error.status).json({"error": error.errorMsg});
         }else{
-            return res.status(500).json({"error": response.error});
+            return res.status(data.status).json({"data": data.result});
         }
-    }
+    })
 })
 module.exports = route;

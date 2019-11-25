@@ -7,9 +7,9 @@ class User{
     async insert(data){
         try{
             const result = await userModel.insertMany(data);
-            return {"success": true, "result": result};
+            return {"status": 200, "result": result};
         }catch(error){
-            return {"success": false, "error": error};
+            return {"status": 500, "error": error};
         }
     }
     /**
@@ -21,9 +21,9 @@ class User{
             let result = await userModel.find({_id: userId})
                                         .select({__v: 0})
                                         .lean();
-            return {"success": true, "result": result};                           
+            return {"status": 200, "result": result};                           
         }catch(error){
-            return {"success": false, "error": error};
+            return {"status": 500, "error": error};
         }
     }
     /**
@@ -50,9 +50,13 @@ class User{
             let result = await userModel.findByIdAndDelete(userId)
                                         .select({__v: 0})
                                         .lean();
-            return {"success": true, "result": result};                           
+            if(!result){
+                return {"status": 404, "result": {"message": `User with Id ${userId} does not exists`}};   
+            }else{
+                return {"status": 200, "result": result};   
+            }                        
         }catch(error){
-            return {"success": false, "error": error};
+            return {"status": 500, "error": error};
         }
     }
     /**
@@ -63,11 +67,14 @@ class User{
             let result = await userModel.find({})
                                         .select({__v: 0})
                                         .lean();
-            return {"success": true, "result": result};
+            return {"status": 200, "result": result};
         }catch(error){
-            return {"success": false, "error": error};
+            return {"status": 500, "error": error};
         }
     }
+    /**
+     * 
+     */
 }
 
 const user = new User();
