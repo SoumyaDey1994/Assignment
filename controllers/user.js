@@ -1,7 +1,7 @@
 const fs = require('fs');
 const async = require('async');
 //Import Validation
-const validate = require('../validation/user');
+const validate = require('./validation/validateUser');
 //Import user service
 const user = require('../services/user');
 const upload = require('../services/upload');
