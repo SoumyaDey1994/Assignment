@@ -1,8 +1,8 @@
 
 const upload = require('../providers/multer');
 
-module.exports = function(request, input){
-    upload.single(input)(request, {}, (error, result) =>{
+module.exports = function(input, request, callback){
+    upload.single(input.field)(request, {}, (error, result) =>{
         if(error){
             return callback(error, null);
         }else{

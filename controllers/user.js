@@ -5,6 +5,7 @@ const validate = require('../validation/user');
 //Import user service
 const user = require('../services/user');
 const upload = require('../services/upload');
+const fileSystem = require('../services/fileSystem');
 
 class User{
     /**
@@ -13,7 +14,7 @@ class User{
      * @param {*} callback 
      */
     readUploadedData(req, callback) {
-        fs.readFile(__dirname+ '/../temp/'+req.file.filename, 'utf-8', (error, data)=>{
+        fileSystem.read(req.file.filename, (error, data)=>{
             if(error){
                 return callback(error, req.file);
             }else{
@@ -26,7 +27,7 @@ class User{
      * @param {*} file 
      */
     removeFile(file){
-        fs.unlink(__dirname + '/../'+file.path, (error, response)=>{});
+        fileSystem.remove(file.path, (error, response)=>{});
     }
     /**
      * @description: Read data from uploaded file & call service to save the content to Mongodb
@@ -84,6 +85,9 @@ class User{
 
         async.waterfall(tasks, (error, result) => {
             if(error){
+                if(result){
+                    this.removeFile(result);
+                }
                 return callback(error, null);
             }else{
                 return callback(null, result);
