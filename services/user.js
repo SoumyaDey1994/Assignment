@@ -72,9 +72,6 @@ class User{
             return {"status": 500, "error": error};
         }
     }
-    /**
-     * 
-     */
 }
 
 const user = new User();

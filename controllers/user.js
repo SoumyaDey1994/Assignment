@@ -1,32 +1,10 @@
 const fs = require('fs');
-const multer = require('multer');
 const async = require('async');
 //Import Validation
 const validate = require('../validation/user');
 //Import user service
 const user = require('../services/user');
-
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, 'temp');
-    },
-    filename: (req, file, callback) => {
-        callback(null, Date.now() + '_' + file.originalname);
-    }
-});
-
-const jsonFileFilter = (req, file, callback) => {
-    if(!file.originalname.match(/\.json$/)){
-        return callback(new Error('Only JSON file is allowed'), null);
-    }else{
-        return callback(null, true);
-    }
-}
-
-const upload = multer({
-    storage: storage,
-    fileFilter: jsonFileFilter
-});
+const upload = require('../services/upload');
 
 class User{
     /**
@@ -58,11 +36,11 @@ class User{
     upload(request, callback){
         const tasks = [
             (callback) => {
-                upload.single('data')(request, {}, (error, result) =>{
+                upload({field: "data"}, request, (error, data)=>{
                     if(error){
                         return callback(error, null);
                     }else{
-                        return callback(null, request);
+                        return callback(null, data);
                     }
                 })
             },
@@ -91,13 +69,13 @@ class User{
                             /**Request Successfully validated
                             * Inser to mongodb
                             */
-                                user.insert(data)
-                                    .then((response)=>{
-                                        return callback(null, response);
-                                    })
-                                    .catch((error)=>{
-                                        return callback(error, null);
-                                    })
+                            user.insert(data)
+                                .then((response)=>{
+                                    return callback(null, response);
+                                })
+                                .catch((error)=>{
+                                    return callback(error, null);
+                                })
                             
                         }
                     }
