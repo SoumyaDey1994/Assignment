@@ -171,6 +171,26 @@ class User{
         }
     }
 
+    async updateUser(userId, updatedInfo, callback){
+        if(!userId){
+            return callback({"status": 400, "errorMsg": "Please provide a user Id to update details"}, null);
+        }
+        if(!updatedInfo || Object.keys(updatedInfo).length === 0){
+            return callback({"status": 400, "errorMsg": "No Details to update"}, null);
+        }else{
+            const error = validate([updatedInfo]);
+            if(error){
+                return callback({"status": 400, "errorMsg": error.details}, null);
+            }else{
+                const output = await user.updateUser(userId, updatedInfo);
+                if(output.result){
+                    return callback(null, {"status": output.status, "result": output.result});
+                }else{
+                    return callback({"status": output.status, "errorMsg": output.error}, null);
+                }
+            }
+        }
+    }
     /**
      * @description: Remove an existing user
      */

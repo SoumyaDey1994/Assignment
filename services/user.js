@@ -36,9 +36,9 @@ class User{
             let result = await userModel.findByIdAndUpdate(userId, {$set: userDetails}, {new: true})
                                         .select({__v: 0})
                                         .lean();
-            return {"success": true, "result": result};                           
+            return {"status": 200, "result": result};                           
         }catch(error){
-            return {"success": false, "error": error};
+            return {"status": 500, "error": error};
         }
     }
     /**

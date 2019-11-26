@@ -1,12 +1,11 @@
 const xlsx = require('json2xls');
 const express = require('express');
 const route = express.Router();
-const validate = require('../validation/user');
-
-const user = require('../services/user');
 const userController = require('../controllers/user');
 
-
+/**
+ * @description: Fetch all user data from Service
+ */
 route.get('/', (req, res)=>{
     userController.fetchAllRecords((error, data)=>{
         if(error){
@@ -16,16 +15,22 @@ route.get('/', (req, res)=>{
         }
     })
 })
+/**
+ * @description: Export all user data as EXCEL file
+ */
 
 route.get('/export', xlsx.middleware, async (req, res)=>{
-    const response = await user.export();
-    if(response.success){
-        return res.status(200).xls('user.xlsx', response.result);
-    }else{
-        return res.status(500).json({"error": error});
-    }
+    userController.fetchAllRecords((error, data)=>{
+        if(error){
+            return res.status(error.status).json({"error": error.errorMsg});
+        }else{
+            return res.status(data.status).xls('user.xlsx', data.result);;
+        }
+    })
 })
-
+/**
+ * @description: Fetch specific user data by id
+ */
 route.get('/:userId', (req, res)=>{
     userController.fetchUser(req.params.userId, (error, data)=>{
         if(error){
@@ -35,7 +40,9 @@ route.get('/:userId', (req, res)=>{
         }
     })
 })
-
+/**
+ * @description: Create new user(s)
+ */
 route.post('/', (req, res)=>{
 
     userController.createUser(req.body, (error, data)=>{
@@ -46,7 +53,9 @@ route.post('/', (req, res)=>{
         }
     })
 })
-
+/**
+ * @description: Bulk upload to create user(s)
+ */
 route.post('/bulk', (req, res)=>{
    userController.upload(req, (error, response)=>{
        if(error){
@@ -58,25 +67,23 @@ route.post('/bulk', (req, res)=>{
        }
    })
 })
-
-route.put('/:userId', async (req, res)=>{
+/**
+ * @description: Update Specific user against userId
+ */
+route.put('/:userId', (req, res)=>{
     const userId = req.params.userId || null;
     const updatedInfo = req.body.data || null;
-    if(!userId){
-        return res.status(400).json({"error": "Please provide a user Id to update details"});
-    }
-    if(!updatedInfo || Object.keys(updatedInfo).length === 0){
-        return res.status(400).json({"error": "No Details to update"});
-    }else{
-        const response = await user.updateUser(userId, updatedInfo);
-        if(response.success){
-            return res.status(200).json({"data": response.result});
+    userController.updateUser(userId, updatedInfo, (error, data)=>{
+        if(error){
+            return res.status(error.status).json({"error": error.errorMsg});
         }else{
-            return res.status(500).json({"error": response.error});
+            return res.status(data.status).json({"data": data.result});
         }
-    }
+    })
 })
-
+/**
+ * @description: Remove Specific user against userId
+ */
 route.delete('/:userId', (req, res)=>{
     const userId = req.params.userId || null;
     userController.removeUser(userId, (error, data)=>{
@@ -87,4 +94,5 @@ route.delete('/:userId', (req, res)=>{
         }
     })
 })
+
 module.exports = route;
