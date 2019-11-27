@@ -9,7 +9,7 @@ moduleAlias.addAliases({
     '@service': root + '/services',
     '@provider': root + '/providers',
     '@helper': root + '/helpers',
-    '@model': root + '/model',
+    '@model': root + '/models',
     '@public': root + '/public',
     '@startup': root + '/startup'
 })
