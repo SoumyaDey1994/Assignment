@@ -1,7 +1,7 @@
 const xlsx = require('json2xls');
 const express = require('express');
 const route = express.Router();
-const userController = require('../controllers/user');
+const userController = require('@controller/user');
 
 /**
  * @description: Fetch all user data from Service

@@ -1,5 +1,5 @@
 
-const upload = require('../providers/multer');
+const upload = require('@provider/multer');
 
 module.exports = function(input, request, callback){
     upload.single(input.field)(request, {}, (error, result) =>{

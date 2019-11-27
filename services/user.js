@@ -1,4 +1,4 @@
-const userModel = require('../model/user');
+const userModel = require('@model/user');
 class User{
     /**
      * Insert Data to MongoDB

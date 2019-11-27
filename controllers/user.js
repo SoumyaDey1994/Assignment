@@ -1,11 +1,11 @@
 const fs = require('fs');
 const async = require('async');
 //Import Validation
-const validate = require('./validation/validateUser');
+const validate = require('@controller/validation/validateUser');
 //Import user service
-const user = require('../services/user');
-const upload = require('../services/upload');
-const fileSystem = require('../services/fileSystem');
+const user = require('@service/user');
+const upload = require('@service/upload');
+const fileSystem = require('@service/fileSystem');
 
 class User{
     /**

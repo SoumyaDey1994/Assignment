@@ -1,16 +1,9 @@
 /**
  * Insalling Required Modules
  */
+require('./helpers/module.alias').load();
 require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
-const morgan = require('morgan');
-/**
- * Import the routes
- */
-const homeRoute = require('./routes/home');
-const dataRoute = require('./routes/data');
-
 /**
  * Initialize the app
  */
@@ -18,18 +11,15 @@ const app = express();
 /**
  * Registering middlewares
  */
-app.use(bodyParser.json());
-app.use(morgan('combined'));
+require("@startup/middleware")(app);
 /**
  * Connect to DB
  */
-require('./startup/db')();
+require('@startup/db')();
 /**
  * Initialize the Routes
  */
-app.use('/data', dataRoute);
-app.use('/', homeRoute);
-
+require("@startup/routes")(app);
 /**
  * Fetch port from environmental variable
  */
