@@ -1,8 +1,6 @@
 /**
  * Insalling Required Modules
  */
-require('./helpers/module.alias').load();
-require('dotenv').config();
 const express = require('express');
 /**
  * Initialize the app
@@ -21,12 +19,6 @@ require('@startup/db')();
  */
 require("@startup/routes")(app);
 /**
- * Fetch port from environmental variable
+ * Export the app
  */
-const port = process.env.PORT;
-/**
- * Start Express app
- */
-app.listen(port, ()=>{
-    console.log(`Server is Listening at PORT ${port}`);
-})
+module.exports = app;
