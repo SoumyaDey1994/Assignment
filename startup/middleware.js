@@ -2,6 +2,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const statusMonitor = require('express-status-monitor');
 const i18n = require('i18n');
+const LocaleService = require("@service/localeService");
 /**
  * i18n Configurations
  */
@@ -17,6 +18,9 @@ i18n.configure({
     // watch for changes in json files to reload locale on updates - defaults to false
     autoReload: true
 })
+
+const localeService = new LocaleService(i18n);
+localeService.setLocale('en_US');
 
 module.exports = (app) => {
     app.use(bodyParser.json());
